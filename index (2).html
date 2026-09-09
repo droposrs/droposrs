@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DROP — Daily Robinhood Drop Party</title>
+<meta name="description" content="Every $DROP trade funds a drop party in Old School RuneScape. Falador Party Room, World 305. 2% per trade, 1.7% into the pot.">
+<link rel="canonical" href="https://droposrs.party/">
+<meta property="og:title" content="DROP — Daily Robinhood Drop Party">
+<meta property="og:description" content="$DROP trading fees → OSRS bonds → Falador Party Room, W305. Watch the pot fill.">
+<meta property="og:url" content="https://droposrs.party/">
+<meta property="og:image" content="https://droposrs.party/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@droponrobinhood">
+<meta name="theme-color" content="#1d3627">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --sherwood:#1d3627; --moss:#2a4a35; --leaf:#7fb069; --parchment:#eadfc4; --straw:#b9ad8f; --oak:#6b4a2b; --gold:#e3b04b; --ember:#d1553b; --ink:#14261b; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--sherwood);color:var(--parchment);font-family:"Instrument Sans",system-ui,sans-serif;font-size:16px;line-height:1.5}
+  a{color:inherit}
+  .px{font-family:"Silkscreen",monospace;letter-spacing:.02em}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+  button{font:inherit;cursor:pointer}
+
+  header{border-bottom:3px solid var(--oak);background:linear-gradient(var(--moss),var(--sherwood))}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand .icon{width:40px;height:40px;object-fit:contain}
+  .brand b{display:block;font-size:20px;line-height:1}
+  .brand span{color:var(--straw);font-size:13px}
+  nav{display:flex;gap:6px;flex-wrap:wrap}
+  nav a{text-decoration:none;padding:8px 12px;border:2px solid transparent;font-weight:500;font-size:14px}
+  nav a.on{border-color:var(--oak);background:var(--ink)}
+  nav a.cta{border-color:var(--gold);color:var(--gold)}
+  nav a:hover,nav a:focus-visible{border-color:var(--gold);outline:none}
+
+  .hero{padding:44px 0 28px;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center}
+  .hero .label{color:var(--straw);margin:0 0 4px}
+  .hero h1{margin:0;font-size:clamp(44px,8vw,96px);line-height:.95;color:var(--gold)}
+  .hero .conv{margin:10px 0 0;font-size:18px}
+  .hero .conv span{color:var(--straw)}
+  .hero .sub{margin:14px 0 0;color:var(--straw);max-width:50ch}
+  .hero .sub b{color:var(--parchment);font-weight:600}
+  .bar{height:14px;background:var(--ink);border:2px solid var(--oak);margin-top:18px;position:relative}
+  .bar b{display:block;height:100%;background:var(--leaf);transition:width .6s ease}
+  .bar-cap{display:flex;justify-content:space-between;font-size:13px;color:var(--straw);margin-top:6px}
+
+  .clock{border:2px solid var(--oak);background:var(--ink);padding:20px 22px}
+  .clock .t{font-size:clamp(30px,5vw,54px);line-height:1;color:var(--parchment)}
+  .clock .t.small{font-size:clamp(22px,3.4vw,34px);line-height:1.15}
+  .clock .where{margin:12px 0 0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:15px}
+  .clock .where dt{color:var(--straw)} .clock .where dd{margin:0}
+  .clock.live{border-color:var(--leaf)} .clock.live .t{color:var(--leaf)}
+
+  .strip{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--oak);background:var(--moss);margin-top:28px}
+  .strip>div{padding:16px 18px;border-right:2px solid var(--oak)}
+  .strip>div:last-child{border-right:0}
+  .strip small{display:block;color:var(--straw);font-size:13px}
+  .strip .v{font-size:24px;line-height:1.2;color:var(--gold)} .strip .v.n{color:var(--parchment)}
+  .strip .d{font-size:13px;color:var(--straw);margin-top:2px}
+
+  .panel{border:2px solid var(--oak);background:var(--moss);margin-top:20px}
+  .panel h2{margin:0;padding:12px 18px;font-size:16px;font-weight:600;border-bottom:2px solid var(--oak);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .panel h2 span{color:var(--straw);font-weight:400;font-size:13px}
+  .panel .in{padding:16px 18px}
+  .kv{display:grid;grid-template-columns:1fr auto;gap:8px 16px;font-size:15px;margin:0}
+  .kv dt{color:var(--straw)} .kv dd{margin:0;text-align:right}
+  svg.chart{width:100%;height:180px;display:block;background:var(--ink);border:1px solid var(--oak)}
+  .msg{font-size:14px;color:var(--straw);margin:10px 0 0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .two .panel{margin-top:20px}
+
+  .ca{display:flex;gap:8px;align-items:stretch;margin-top:6px}
+  .ca code{flex:1;background:var(--ink);border:2px solid var(--oak);padding:10px 12px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--parchment)}
+  .ca button{background:var(--gold);color:#2a1a08;border:2px solid #8a6520;padding:0 14px;font-weight:600}
+  .ca button:hover{background:#f0c05e}
+  .warn{border-left:3px solid var(--ember);padding:8px 12px;margin-top:14px;font-size:14px;color:var(--straw)}
+  .warn b{color:var(--parchment)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid #3b5a45;vertical-align:top}
+  th{color:var(--straw);font-weight:500}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:0}
+  .tag{display:inline-block;padding:1px 6px;border:1px solid var(--oak);font-size:12px;color:var(--straw)}
+  .tag.done{border-color:var(--leaf);color:var(--leaf)} .tag.rolled{border-color:var(--ember);color:var(--ember)}
+  .empty{color:var(--straw);padding:18px;text-align:center;border:1px dashed var(--oak)}
+  footer{margin:40px 0 30px;color:var(--straw);font-size:13px;line-height:1.7}
+  @media (max-width:900px){ .hero,.two{grid-template-columns:1fr} .strip{grid-template-columns:repeat(2,1fr)} .strip>div{border-bottom:2px solid var(--oak)} .strip>div:nth-child(2n){border-right:0} }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="https://droposrs.party/">
+      <img class="icon" src="/logo-mark.png" alt="" width="40" height="40">
+      <div><b class="px">DROP</b><span>Daily Robinhood Drop Party</span></div>
+    </a>
+    <nav aria-label="Primary">
+      <a href="https://x.com/droponrobinhood" target="_blank" rel="noopener">𝕏 @droponrobinhood</a>
+      <a href="#" class="on">The pot</a>
+      <a href="#parties">Past parties</a>
+      <a href="#" id="pons-link" class="cta" target="_blank" rel="noopener">Trade $DROP</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" aria-labelledby="pot-h">
+    <div>
+      <p class="label" id="pot-label">In the pot right now</p>
+      <h1 id="pot-h" class="px"><span id="pot">—</span></h1>
+      <p class="conv px" id="conv">—</p>
+      <p class="sub"><b>2% on every $DROP trade, 1.7% into the pot.</b> The pot becomes OSRS bonds, the bonds become loot, and the loot goes into the chest at the Falador Party Room on World 305. Balloons for whoever shows up.</p>
+      <div class="bar" role="progressbar" aria-labelledby="bar-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><b id="bar" style="width:0%"></b></div>
+      <div class="bar-cap"><span id="bar-label">0% of the 10m minimum</span><span id="bar-right"></span></div>
+    </div>
+    <div class="clock" id="clock">
+      <div class="t px" id="countdown">—</div>
+      <dl class="where">
+        <dt>When</dt><dd id="party-time">—</dd>
+        <dt>Where</dt><dd id="party-where"></dd>
+        <dt>World</dt><dd id="party-world"></dd>
+        <dt>Look for</dt><dd id="party-rsn"></dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="strip" aria-label="All-time figures">
+    <div><small>Raised, all time</small><div class="v px" id="all-raised">—</div><div class="d" id="all-raised-hood">— HOOD in creator fees</div></div>
+    <div><small>Dropped, all time</small><div class="v px" id="all-gp">—</div><div class="d" id="all-parties">— parties, — day streak</div></div>
+    <div><small>Treasury</small><div class="v px" id="treasury">—</div><div class="d">HOOD earned, not yet converted</div></div>
+    <div><small>Party account</small><div class="v px n" id="float">—</div><div class="d">gp loaded and ready to drop</div></div>
+  </section>
+
+  <div class="two">
+    <section class="panel" aria-labelledby="fees-h">
+      <h2 id="fees-h">Fees flowing in <span id="fees-updated">waiting for launch</span></h2>
+      <div class="in">
+        <svg class="chart" id="chart" viewBox="0 0 600 180" preserveAspectRatio="none" aria-label="Cumulative creator fees since the last party"></svg>
+        <dl class="kv" style="margin-top:14px">
+          <dt>Creator fees earned since last party</dt><dd class="px" id="fees-hood">—</dd>
+          <dt>HOOD price</dt><dd class="px" id="hood-price">—</dd>
+          <dt>Bond at Jagex</dt><dd class="px" id="bond-usd">—</dd>
+          <dt>Bond on the GE</dt><dd class="px" id="bond-gp">—</dd>
+        </dl>
+        <p class="msg" id="pot-rule"></p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="tok-h">
+      <h2 id="tok-h">$DROP <span>Robinhood Chain · Pons v2 · paired to HOOD</span></h2>
+      <div class="in">
+        <small style="color:var(--straw)">Contract address</small>
+        <div class="ca"><code id="ca">Posted here and on X at launch</code><button id="copy" hidden>Copy</button></div>
+        <dl class="kv" style="margin-top:14px">
+          <dt>Fee per trade</dt><dd>2% (1% standard + 1% creator tax)</dd>
+          <dt>Goes to the pot</dt><dd>1.7%</dd>
+          <dt>Supply</dt><dd>1,000,000,000, fixed, no team allocation</dd>
+          <dt>Liquidity</dt><dd>locked at graduation, permanently</dd>
+        </dl>
+        <div class="warn"><b>We never DM first.</b> The only contract address is the one on this page and on @droponrobinhood. Anything else is a scam.</div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" id="parties" aria-labelledby="log-h">
+    <h2 id="log-h">Past parties <span id="log-count"></span></h2>
+    <div class="in" id="log"></div>
+  </section>
+
+  <footer>
+    Creator fees read from the $DROP pool on Robinhood Chain. GP values use the OSRS Wiki real-time GE price of bonds (item 13190). HOOD raised and GP dropped are reported as separate figures.<br>
+    Not financial advice, neither in GP nor USD. Old School RuneScape is a trademark of Jagex. Not affiliated with Jagex, Robinhood Markets or Pons.
+  </footer>
+</main>
+
+<script>
+/* ============ CONFIG ============
+   Edit here until the indexer writes /api/state.
+   mode: "launch" = first party fires when the pot hits minGp (no clock)
+         "daily"  = party every day at cutoffUtc                          */
+const PARTY = {
+  mode: "launch",
+  cutoffUtc: "18:00",
+  where: "Falador Party Room",
+  world: 305,
+  rsn: "droposrs1",              // party account's RuneScape name
+  minGp: 10_000_000,
+  opsReservePct: 10,
+};
+const POOL  = { address: "", ponsUrl: "https://www.ponsfamily.com/launchpad" };
+const RATES = { hoodUsd: null, bondUsd: 10.0 };      // hoodUsd from the pool quote; bondUsd from Jagex's store
+const LIVE  = { feesHood: 0, series: [], updatedAt: null }; // cumulative HOOD since last party, one point per 15 min
+const STATS = { raisedHood: 0, raisedUsd: 0, givenGp: 0, parties: 0, streak: 0, treasuryHood: 0, floatGp: 0 };
+const LOG   = [ /* { date:"2026-09-10", raisedUsd:38, gp:41_000_000, status:"done", proof:"https://x.com/droponrobinhood/status/…" } */ ];
+
+/* ============ helpers ============ */
+const $ = id => document.getElementById(id);
+const gp = n => n >= 1e9 ? (n/1e9).toFixed(2)+"b" : n >= 1e6 ? (n/1e6).toFixed(1)+"m" : n >= 1e3 ? (n/1e3).toFixed(0)+"k" : String(Math.round(n));
+const usd = n => "$"+Number(n||0).toLocaleString(undefined,{maximumFractionDigits:0});
+let bondGp = 11_000_000;
+
+/* ============ static ============ */
+$("party-where").textContent = PARTY.where;
+$("party-world").textContent = "W"+PARTY.world;
+$("party-rsn").textContent = PARTY.rsn || "announced on X";
+$("bond-usd").textContent = usd(RATES.bondUsd);
+$("pons-link").href = POOL.address ? `${POOL.ponsUrl.replace(/\/$/,"")}/${POOL.address}` : POOL.ponsUrl;
+if (POOL.address){
+  $("ca").textContent = POOL.address; $("copy").hidden = false;
+  $("copy").onclick = () => navigator.clipboard.writeText(POOL.address).then(()=>{ $("copy").textContent="Copied"; setTimeout(()=>$("copy").textContent="Copy",1500); });
+}
+
+/* ============ pot ============ */
+function potGp(){
+  const raised = RATES.hoodUsd ? LIVE.feesHood*RATES.hoodUsd : 0;
+  const bonds = Math.floor(raised*(1-PARTY.opsReservePct/100)/RATES.bondUsd);
+  return { raised, bonds, gp: bonds*bondGp };
+}
+function renderPot(){
+  const p = potGp();
+  $("pot").textContent = gp(p.gp)+" gp";
+  $("conv").innerHTML = `${usd(p.raised)} <span>in fees → ${p.bonds} bond${p.bonds===1?"":"s"} → ${gp(p.gp)} gp</span>`;
+  const pct = Math.min(100, p.gp/PARTY.minGp*100);
+  $("bar").style.width = pct+"%";
+  document.querySelector(".bar").setAttribute("aria-valuenow", Math.round(pct));
+  $("bar-label").textContent = `${Math.round(pct)}% of the ${gp(PARTY.minGp)} minimum`;
+  $("bar-right").textContent = p.gp >= PARTY.minGp ? "minimum reached" : `${gp(PARTY.minGp-p.gp)} gp to go`;
+  $("fees-hood").textContent = LIVE.feesHood.toFixed(4)+" HOOD";
+  $("hood-price").textContent = RATES.hoodUsd ? usd(RATES.hoodUsd) : "—";
+  $("bond-gp").textContent = gp(bondGp)+" gp";
+  $("fees-updated").textContent = LIVE.updatedAt ? "updated "+new Date(LIVE.updatedAt).toLocaleTimeString() : (POOL.address ? "indexing…" : "waiting for launch");
+  $("pot-rule").textContent = PARTY.mode === "launch"
+    ? `The first party fires as soon as the pot reaches ${gp(PARTY.minGp)} gp. After that it's every day at ${PARTY.cutoffUtc} UTC; a night under ${gp(PARTY.minGp)} gp rolls into the next.`
+    : `${PARTY.opsReservePct}% kept for running costs. Pot freezes at ${PARTY.cutoffUtc} UTC; a night under ${gp(PARTY.minGp)} gp rolls into the next.`;
+}
+function renderStats(){
+  $("all-raised").textContent = usd(STATS.raisedUsd);
+  $("all-raised-hood").textContent = STATS.raisedHood.toFixed(2)+" HOOD in creator fees";
+  $("all-gp").textContent = gp(STATS.givenGp)+" gp";
+  $("all-parties").textContent = `${STATS.parties} parties, ${STATS.streak} day streak`;
+  $("treasury").textContent = STATS.treasuryHood.toFixed(2)+" HOOD";
+  $("float").textContent = gp(STATS.floatGp)+" gp";
+}
+renderPot(); renderStats();
+
+/* ============ clock ============ */
+function nextCutoff(){
+  const [h,m] = PARTY.cutoffUtc.split(":").map(Number), now = new Date();
+  const t = new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),h,m));
+  if (t <= now) t.setUTCDate(t.getUTCDate()+1);
+  return t;
+}
+function tick(){
+  const c = $("countdown");
+  if (PARTY.mode === "launch"){
+    const hit = potGp().gp >= PARTY.minGp;
+    $("clock").classList.toggle("live", hit);
+    c.className = "t px small";
+    c.textContent = hit ? "10M HIT — PARTY INCOMING" : "WHEN THE POT HITS 10M";
+    $("party-time").textContent = hit ? "now — check X" : "first party, then daily 18:00 UTC";
+    return;
+  }
+  const now = Date.now(), t = nextCutoff().getTime();
+  const live = now - (t-86400000) < 3600000;
+  $("clock").classList.toggle("live", live);
+  $("party-time").textContent = PARTY.cutoffUtc+" UTC, daily";
+  c.className = "t px";
+  if (live){ c.textContent = "LIVE NOW"; return; }
+  const s = Math.floor((t-now)/1000);
+  c.textContent = [s/3600, s%3600/60, s%60].map(v=>String(Math.floor(v)).padStart(2,"0")).join(":");
+}
+tick(); setInterval(tick, 1000);
+
+/* ============ chart ============ */
+function drawChart(vals){
+  const svg=$("chart"), W=600, H=180, pad=8;
+  if (!vals.length){ svg.innerHTML=`<text x="300" y="95" text-anchor="middle" fill="#b9ad8f" font-size="14">${POOL.address?"Indexing the pool…":"The chart starts when trading does."}</text>`; return; }
+  const minLine = PARTY.minGp/bondGp*RATES.bondUsd/(1-PARTY.opsReservePct/100)/(RATES.hoodUsd||1);
+  const hi = Math.max(...vals, minLine)*1.05;
+  const x=i=>pad+i*(W-2*pad)/Math.max(1,vals.length-1), y=v=>H-pad-(v/hi)*(H-2*pad);
+  const path = vals.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  svg.innerHTML = `<line x1="0" x2="${W}" y1="${y(minLine)}" y2="${y(minLine)}" stroke="var(--ember)" stroke-dasharray="4 4"/>
+    <path d="${path} L${x(vals.length-1)},${H-pad} L${pad},${H-pad} Z" fill="rgba(127,176,105,.18)"/>
+    <path d="${path}" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+}
+drawChart(LIVE.series);
+
+/* ============ party log ============ */
+function renderLog(){
+const L=$("log");
+if (!LOG.length) L.innerHTML='<div class="empty">No parties yet. Each one lands here with the amount raised, the GP dropped, and the proof post.</div>';
+else L.innerHTML=`<table><thead><tr><th>Date</th><th class="r">Raised</th><th class="r">Dropped</th><th>Status</th><th>Proof</th></tr></thead><tbody>${
+  LOG.map(r=>`<tr><td>${r.date}</td><td class="r">${usd(r.raisedUsd)}</td><td class="r">${r.gp?gp(r.gp)+" gp":"—"}</td><td><span class="tag ${r.status}">${r.status}</span></td><td>${r.proof?`<a href="${r.proof}" target="_blank" rel="noopener">post</a>`:"—"}</td></tr>`).join("")}</tbody></table>`;
+$("log-count").textContent = LOG.length ? LOG.length+" nights" : "";
+}
+renderLog();
+
+/* ============ live bond price ============ */
+fetch("https://prices.runescape.wiki/api/v1/osrs/latest?id=13190").then(r=>r.json()).then(j=>{
+  const d=j.data[13190]; if (d){ bondGp = d.low; renderPot(); drawChart(LIVE.series); }
+}).catch(()=>{});
+
+/* ============ live data from the Worker ============
+   Set API to your Worker's URL. Leave it blank to use the config values above. */
+const API = "https://drop-api.zsupplements47.workers.dev";
+async function refresh(){
+  if (!API) return;
+  try{
+    const s = await (await fetch(API.replace(/\/$/,"")+"/api/state", {cache:"no-store"})).json();
+    Object.assign(RATES, s.rates); Object.assign(LIVE, s.live); Object.assign(STATS, s.stats);
+    if (s.party) Object.assign(PARTY, s.party);
+    if (s.log) { LOG.length = 0; LOG.push(...s.log); renderLog(); }
+    renderPot(); renderStats(); drawChart(LIVE.series);
+  }catch(e){}
+}
+refresh(); setInterval(refresh, 30000);
+</script>
+</body>
+</html>
