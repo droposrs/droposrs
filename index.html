@@ -188,7 +188,7 @@ const PARTY = {
   cutoffUtc: "18:00",
   where: "Falador Party Room",
   world: 305,
-  rsn: "droposrs1",                       // party account's RuneScape name
+  rsn: "droposrs1",              // party account's RuneScape name
   minGp: 10_000_000,
   opsReservePct: 10,
 };
@@ -291,24 +291,34 @@ function drawChart(vals){
 drawChart(LIVE.series);
 
 /* ============ party log ============ */
+function renderLog(){
 const L=$("log");
 if (!LOG.length) L.innerHTML='<div class="empty">No parties yet. Each one lands here with the amount raised, the GP dropped, and the proof post.</div>';
 else L.innerHTML=`<table><thead><tr><th>Date</th><th class="r">Raised</th><th class="r">Dropped</th><th>Status</th><th>Proof</th></tr></thead><tbody>${
   LOG.map(r=>`<tr><td>${r.date}</td><td class="r">${usd(r.raisedUsd)}</td><td class="r">${r.gp?gp(r.gp)+" gp":"—"}</td><td><span class="tag ${r.status}">${r.status}</span></td><td>${r.proof?`<a href="${r.proof}" target="_blank" rel="noopener">post</a>`:"—"}</td></tr>`).join("")}</tbody></table>`;
 $("log-count").textContent = LOG.length ? LOG.length+" nights" : "";
+}
+renderLog();
 
 /* ============ live bond price ============ */
 fetch("https://prices.runescape.wiki/api/v1/osrs/latest?id=13190").then(r=>r.json()).then(j=>{
   const d=j.data[13190]; if (d){ bondGp = d.low; renderPot(); drawChart(LIVE.series); }
 }).catch(()=>{});
 
-/* ============ indexer hook ============
-   Once the Worker exists, it serves /api/state as
-   { rates:{hoodUsd}, live:{feesHood,series,updatedAt}, stats:{…}, log:[…], party:{mode} }
-   Uncomment to poll it every 30s. */
-// setInterval(async()=>{ try{ const s=await (await fetch("/api/state")).json();
-//   Object.assign(RATES,s.rates); Object.assign(LIVE,s.live); Object.assign(STATS,s.stats); if(s.party) Object.assign(PARTY,s.party);
-//   renderPot(); renderStats(); drawChart(LIVE.series); }catch(e){} }, 30000);
+/* ============ live data from the Worker ============
+   Set API to your Worker's URL. Leave it blank to use the config values above. */
+const API = "https://drop-api.zsupplements47.workers.dev";
+async function refresh(){
+  if (!API) return;
+  try{
+    const s = await (await fetch(API.replace(/\/$/,"")+"/api/state", {cache:"no-store"})).json();
+    Object.assign(RATES, s.rates); Object.assign(LIVE, s.live); Object.assign(STATS, s.stats);
+    if (s.party) Object.assign(PARTY, s.party);
+    if (s.log) { LOG.length = 0; LOG.push(...s.log); renderLog(); }
+    renderPot(); renderStats(); drawChart(LIVE.series);
+  }catch(e){}
+}
+refresh(); setInterval(refresh, 30000);
 </script>
 </body>
 </html>
