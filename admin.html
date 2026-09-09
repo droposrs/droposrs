@@ -40,7 +40,7 @@
   <div class="box">
     <h2 style="margin-top:0">Fix numbers</h2>
     <label>Party account GP (float)<input id="s-float" inputmode="numeric"></label>
-    <label>Treasury HOOD (leave blank to show claimable fees)<input id="s-treasury"></label>
+    <label>Treasury ETH (leave blank to show claimable fees)<input id="s-treasury"></label>
     <label>Mode<select id="s-mode"><option value="">no change</option><option value="launch">launch (first party at 10m)</option><option value="daily">daily 18:00 UTC</option></select></label>
     <button id="set">Save</button>
     <div class="msg" id="m2"></div>
@@ -70,7 +70,7 @@ async function post(body,msgEl){
 }
 $("done").onclick=()=>post({action:"party_done",gp:$("gp").value.replace(/\D/g,""),proof:$("proof").value,floatGp:$("float").value.replace(/\D/g,"")||null},$("m1"));
 $("rolled").onclick=()=>post({action:"rolled"},$("m1"));
-$("set").onclick=()=>post({action:"set",stats:{floatGp:$("s-float").value.replace(/\D/g,""),treasuryHood:$("s-treasury").value},party:{mode:$("s-mode").value}},$("m2"));
+$("set").onclick=()=>post({action:"set",stats:{floatGp:$("s-float").value.replace(/\D/g,""),treasuryQuote:$("s-treasury").value},party:{mode:$("s-mode").value}},$("m2"));
 async function show(path,opts){ $("out").textContent="…"; try{ const r=await fetch(base()+path,opts); $("out").textContent=JSON.stringify(await r.json(),null,2);}catch(e){$("out").textContent="Failed: "+e.message;} }
 $("tick").onclick=()=>show("/api/tick",{headers:{"x-admin-key":$("key").value}});
 $("discover").onclick=()=>show("/api/discover?address="+encodeURIComponent($("addr").value.trim()));

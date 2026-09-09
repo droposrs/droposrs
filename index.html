@@ -130,9 +130,9 @@
   </section>
 
   <section class="strip" aria-label="All-time figures">
-    <div><small>Raised, all time</small><div class="v px" id="all-raised">—</div><div class="d" id="all-raised-hood">— HOOD in creator fees</div></div>
+    <div><small>Raised, all time</small><div class="v px" id="all-raised">—</div><div class="d" id="all-raised-quote">— ETH in creator fees</div></div>
     <div><small>Dropped, all time</small><div class="v px" id="all-gp">—</div><div class="d" id="all-parties">— parties, — day streak</div></div>
-    <div><small>Treasury</small><div class="v px" id="treasury">—</div><div class="d">HOOD earned, not yet converted</div></div>
+    <div><small>Treasury</small><div class="v px" id="treasury">—</div><div class="d">ETH earned, not yet converted</div></div>
     <div><small>Party account</small><div class="v px n" id="float">—</div><div class="d">gp loaded and ready to drop</div></div>
   </section>
 
@@ -142,8 +142,8 @@
       <div class="in">
         <svg class="chart" id="chart" viewBox="0 0 600 180" preserveAspectRatio="none" aria-label="Cumulative creator fees since the last party"></svg>
         <dl class="kv" style="margin-top:14px">
-          <dt>Creator fees earned since last party</dt><dd class="px" id="fees-hood">—</dd>
-          <dt>HOOD price</dt><dd class="px" id="hood-price">—</dd>
+          <dt>Creator fees earned since last party</dt><dd class="px" id="fees-quote">—</dd>
+          <dt>ETH price</dt><dd class="px" id="quote-price">—</dd>
           <dt>Bond at Jagex</dt><dd class="px" id="bond-usd">—</dd>
           <dt>Bond on the GE</dt><dd class="px" id="bond-gp">—</dd>
         </dl>
@@ -152,7 +152,7 @@
     </section>
 
     <section class="panel" aria-labelledby="tok-h">
-      <h2 id="tok-h">$DROP <span>Robinhood Chain · Pons v2 · paired to HOOD</span></h2>
+      <h2 id="tok-h">$DROP <span>Robinhood Chain · Pons · paired to ETH</span></h2>
       <div class="in">
         <small style="color:var(--straw)">Contract address</small>
         <div class="ca"><code id="ca">Posted here and on X at launch</code><button id="copy" hidden>Copy</button></div>
@@ -173,7 +173,7 @@
   </section>
 
   <footer>
-    Creator fees read from the $DROP pool on Robinhood Chain. GP values use the OSRS Wiki real-time GE price of bonds (item 13190). HOOD raised and GP dropped are reported as separate figures.<br>
+    Creator fees read from the $DROP pool on Robinhood Chain. GP values use the OSRS Wiki real-time GE price of bonds (item 13190). ETH raised and GP dropped are reported as separate figures.<br>
     Not financial advice, neither in GP nor USD. Old School RuneScape is a trademark of Jagex. Not affiliated with Jagex, Robinhood Markets or Pons.
   </footer>
 </main>
@@ -193,9 +193,9 @@ const PARTY = {
   opsReservePct: 10,
 };
 const POOL  = { address: "", ponsUrl: "https://www.ponsfamily.com/launchpad" };
-const RATES = { hoodUsd: null, bondUsd: 10.0 };      // hoodUsd from the pool quote; bondUsd from Jagex's store
-const LIVE  = { feesHood: 0, series: [], updatedAt: null }; // cumulative HOOD since last party, one point per 15 min
-const STATS = { raisedHood: 0, raisedUsd: 0, givenGp: 0, parties: 0, streak: 0, treasuryHood: 0, floatGp: 0 };
+const RATES = { quoteUsd: null, bondUsd: 10.0 };     // quoteUsd = ETH price; bondUsd from Jagex's store
+const LIVE  = { feesQuote: 0, series: [], updatedAt: null }; // cumulative ETH since last party, one point per 15 min
+const STATS = { raisedQuote: 0, raisedUsd: 0, givenGp: 0, parties: 0, streak: 0, treasuryQuote: 0, floatGp: 0 };
 const LOG   = [ /* { date:"2026-09-10", raisedUsd:38, gp:41_000_000, status:"done", proof:"https://x.com/droponrobinhood/status/…" } */ ];
 
 /* ============ helpers ============ */
@@ -217,7 +217,7 @@ if (POOL.address){
 
 /* ============ pot ============ */
 function potGp(){
-  const raised = RATES.hoodUsd ? LIVE.feesHood*RATES.hoodUsd : 0;
+  const raised = RATES.quoteUsd ? LIVE.feesQuote*RATES.quoteUsd : 0;
   const bonds = Math.floor(raised*(1-PARTY.opsReservePct/100)/RATES.bondUsd);
   return { raised, bonds, gp: bonds*bondGp };
 }
@@ -230,8 +230,8 @@ function renderPot(){
   document.querySelector(".bar").setAttribute("aria-valuenow", Math.round(pct));
   $("bar-label").textContent = `${Math.round(pct)}% of the ${gp(PARTY.minGp)} minimum`;
   $("bar-right").textContent = p.gp >= PARTY.minGp ? "minimum reached" : `${gp(PARTY.minGp-p.gp)} gp to go`;
-  $("fees-hood").textContent = LIVE.feesHood.toFixed(4)+" HOOD";
-  $("hood-price").textContent = RATES.hoodUsd ? usd(RATES.hoodUsd) : "—";
+  $("fees-quote").textContent = LIVE.feesQuote.toFixed(5)+" ETH";
+  $("quote-price").textContent = RATES.quoteUsd ? usd(RATES.quoteUsd) : "—";
   $("bond-gp").textContent = gp(bondGp)+" gp";
   $("fees-updated").textContent = LIVE.updatedAt ? "updated "+new Date(LIVE.updatedAt).toLocaleTimeString() : (POOL.address ? "indexing…" : "waiting for launch");
   $("pot-rule").textContent = PARTY.mode === "launch"
@@ -240,10 +240,10 @@ function renderPot(){
 }
 function renderStats(){
   $("all-raised").textContent = usd(STATS.raisedUsd);
-  $("all-raised-hood").textContent = STATS.raisedHood.toFixed(2)+" HOOD in creator fees";
+  $("all-raised-quote").textContent = STATS.raisedQuote.toFixed(4)+" ETH in creator fees";
   $("all-gp").textContent = gp(STATS.givenGp)+" gp";
   $("all-parties").textContent = `${STATS.parties} parties, ${STATS.streak} day streak`;
-  $("treasury").textContent = STATS.treasuryHood.toFixed(2)+" HOOD";
+  $("treasury").textContent = Number(STATS.treasuryQuote||0).toFixed(4)+" ETH";
   $("float").textContent = gp(STATS.floatGp)+" gp";
 }
 renderPot(); renderStats();
@@ -280,7 +280,7 @@ tick(); setInterval(tick, 1000);
 function drawChart(vals){
   const svg=$("chart"), W=600, H=180, pad=8;
   if (!vals.length){ svg.innerHTML=`<text x="300" y="95" text-anchor="middle" fill="#b9ad8f" font-size="14">${POOL.address?"Indexing the pool…":"The chart starts when trading does."}</text>`; return; }
-  const minLine = PARTY.minGp/bondGp*RATES.bondUsd/(1-PARTY.opsReservePct/100)/(RATES.hoodUsd||1);
+  const minLine = PARTY.minGp/bondGp*RATES.bondUsd/(1-PARTY.opsReservePct/100)/(RATES.quoteUsd||1);
   const hi = Math.max(...vals, minLine)*1.05;
   const x=i=>pad+i*(W-2*pad)/Math.max(1,vals.length-1), y=v=>H-pad-(v/hi)*(H-2*pad);
   const path = vals.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
