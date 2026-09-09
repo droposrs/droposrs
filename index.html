@@ -192,7 +192,7 @@ const PARTY = {
   minGp: 10_000_000,
   opsReservePct: 10,
 };
-const POOL  = { address: "0x889db1Bd374a040ec0b0B959c43Bb4ED5bF15924", tokenUrl: "", ponsUrl: "https://www.ponsfamily.com/launchpad/0x889db1Bd374a040ec0b0B959c43Bb4ED5bF15924" }; // tokenUrl: paste your token's Pons page URL
+const POOL  = { address: "0x889db1Bd374a040ec0b0B959c43Bb4ED5bF15924", tokenUrl: "", ponsUrl: "https://www.ponsfamily.com/launchpad/0x889db1Bd374a040ec0b0B959c43Bb4ED5bF15924" };
 const RATES = { quoteUsd: null, bondUsd: 10.0 };     // quoteUsd = ETH price; bondUsd from Jagex's store
 const LIVE  = { feesQuote: 0, series: [], updatedAt: null }; // cumulative ETH since last party, one point per 15 min
 const STATS = { raisedQuote: 0, raisedUsd: 0, givenGp: 0, parties: 0, streak: 0, treasuryQuote: 0, floatGp: 0 };
@@ -202,6 +202,7 @@ const LOG   = [ /* { date:"2026-09-10", raisedUsd:38, gp:41_000_000, status:"don
 const $ = id => document.getElementById(id);
 const gp = n => n >= 1e9 ? (n/1e9).toFixed(2)+"b" : n >= 1e6 ? (n/1e6).toFixed(1)+"m" : n >= 1e3 ? (n/1e3).toFixed(0)+"k" : String(Math.round(n));
 const usd = n => "$"+Number(n||0).toLocaleString(undefined,{maximumFractionDigits:0});
+const usd2 = n => "$"+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 let bondGp = 11_000_000;
 
 /* ============ static ============ */
@@ -218,13 +219,14 @@ if (POOL.address){
 /* ============ pot ============ */
 function potGp(){
   const raised = RATES.quoteUsd ? LIVE.feesQuote*RATES.quoteUsd : 0;
-  const bonds = Math.floor(raised*(1-PARTY.opsReservePct/100)/RATES.bondUsd);
+  const net = raised*(1-PARTY.opsReservePct/100);
+  const bonds = net/RATES.bondUsd;                    // fractional, so the pot moves from the first trade
   return { raised, bonds, gp: bonds*bondGp };
 }
 function renderPot(){
   const p = potGp();
   $("pot").textContent = gp(p.gp)+" gp";
-  $("conv").innerHTML = `${usd(p.raised)} <span>in fees → ${p.bonds} bond${p.bonds===1?"":"s"} → ${gp(p.gp)} gp</span>`;
+  $("conv").innerHTML = `${usd2(p.raised)} <span>in fees → ${p.bonds.toFixed(2)} bonds → ${gp(p.gp)} gp</span>`;
   const pct = Math.min(100, p.gp/PARTY.minGp*100);
   $("bar").style.width = pct+"%";
   document.querySelector(".bar").setAttribute("aria-valuenow", Math.round(pct));
