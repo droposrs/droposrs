@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>DROP admin</title>
+<style>
+  body{margin:0;background:#1d3627;color:#eadfc4;font-family:system-ui,sans-serif;padding:20px}
+  main{max-width:520px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 6px} h2{font-size:15px;margin:26px 0 8px;color:#b9ad8f}
+  label{display:block;font-size:13px;color:#b9ad8f;margin-top:10px}
+  input,select{width:100%;box-sizing:border-box;background:#14261b;color:#eadfc4;border:2px solid #6b4a2b;padding:9px 10px;font:inherit;margin-top:4px}
+  button{margin-top:12px;background:#e3b04b;color:#2a1a08;border:2px solid #8a6520;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+  button.quiet{background:transparent;color:#eadfc4;border-color:#6b4a2b}
+  .msg{margin-top:10px;font-size:14px;min-height:1.4em} .ok{color:#7fb069} .err{color:#d1553b}
+  .box{border:2px solid #6b4a2b;padding:14px 16px;background:#2a4a35;margin-top:14px}
+  pre{white-space:pre-wrap;font-size:12px;background:#14261b;padding:10px;border:1px solid #6b4a2b;max-height:280px;overflow:auto}
+</style>
+</head>
+<body><main>
+  <h1>DROP admin</h1>
+  <p style="color:#b9ad8f;font-size:14px;margin:0">Nothing here changes without the admin key.</p>
+
+  <div class="box">
+    <label>API base URL (your Worker)<input id="api" placeholder="https://drop-api.YOURNAME.workers.dev"></label>
+    <label>Admin key<input id="key" type="password"></label>
+  </div>
+
+  <div class="box">
+    <h2 style="margin-top:0">Record tonight's party</h2>
+    <label>GP dropped (e.g. 12500000)<input id="gp" inputmode="numeric"></label>
+    <label>Proof link (X post)<input id="proof" placeholder="https://x.com/droponrobinhood/status/…"></label>
+    <label>GP left on the party account after the drop<input id="float" inputmode="numeric"></label>
+    <button id="done">Party done — reset the pot</button>
+    <button id="rolled" class="quiet">Under 10m — rolled to tomorrow</button>
+    <div class="msg" id="m1"></div>
+  </div>
+
+  <div class="box">
+    <h2 style="margin-top:0">Fix numbers</h2>
+    <label>Party account GP (float)<input id="s-float" inputmode="numeric"></label>
+    <label>Treasury HOOD (leave blank to show claimable fees)<input id="s-treasury"></label>
+    <label>Mode<select id="s-mode"><option value="">no change</option><option value="launch">launch (first party at 10m)</option><option value="daily">daily 18:00 UTC</option></select></label>
+    <button id="set">Save</button>
+    <div class="msg" id="m2"></div>
+  </div>
+
+  <div class="box">
+    <h2 style="margin-top:0">Indexer</h2>
+    <label>Curve address (for ABI import / discovery)<input id="addr" placeholder="0x…"></label>
+    <button id="abi" class="quiet">Import ABI from explorer</button>
+    <button id="probe" class="quiet">Probe likely fee functions</button>
+    <button id="tick" class="quiet">Poll the curve now</button>
+    <button id="discover" class="quiet">List read functions</button>
+    <button id="state" class="quiet">Show /api/state</button>
+    <pre id="out"></pre>
+  </div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+$("api").value = localStorage.getItem("drop_api")||""; $("api").onchange=e=>localStorage.setItem("drop_api",e.target.value.trim());
+const base=()=>$("api").value.trim().replace(/\/$/,"");
+async function post(body,msgEl){
+  msgEl.textContent="…"; msgEl.className="msg";
+  try{ const r=await fetch(base()+"/api/admin",{method:"POST",headers:{"content-type":"application/json","x-admin-key":$("key").value},body:JSON.stringify(body)});
+    const j=await r.json(); if(!r.ok||!j.ok) throw new Error(j.error||r.status);
+    msgEl.textContent="Saved. The site updates within 30 seconds."; msgEl.className="msg ok";
+  }catch(e){ msgEl.textContent="Failed: "+e.message; msgEl.className="msg err"; }
+}
+$("done").onclick=()=>post({action:"party_done",gp:$("gp").value.replace(/\D/g,""),proof:$("proof").value,floatGp:$("float").value.replace(/\D/g,"")||null},$("m1"));
+$("rolled").onclick=()=>post({action:"rolled"},$("m1"));
+$("set").onclick=()=>post({action:"set",stats:{floatGp:$("s-float").value.replace(/\D/g,""),treasuryHood:$("s-treasury").value},party:{mode:$("s-mode").value}},$("m2"));
+async function show(path,opts){ $("out").textContent="…"; try{ const r=await fetch(base()+path,opts); $("out").textContent=JSON.stringify(await r.json(),null,2);}catch(e){$("out").textContent="Failed: "+e.message;} }
+$("tick").onclick=()=>show("/api/tick",{headers:{"x-admin-key":$("key").value}});
+$("discover").onclick=()=>show("/api/discover?address="+encodeURIComponent($("addr").value.trim()));
+$("probe").onclick=()=>show("/api/probe?address="+encodeURIComponent($("addr").value.trim()));
+$("abi").onclick=async()=>{
+  const addr=$("addr").value.trim(); $("out").textContent="Fetching ABI in your browser…";
+  try{
+    const r=await fetch("https://robinhoodchain.blockscout.com/api/v2/smart-contracts/"+addr,{headers:{accept:"application/json"}});
+    const j=await r.json(); if(!j.abi) throw new Error("no ABI in explorer response (not verified?)");
+    const p=await fetch(base()+"/api/admin",{method:"POST",headers:{"content-type":"application/json","x-admin-key":$("key").value},body:JSON.stringify({action:"set_abi",address:addr,abi:j.abi})});
+    const pj=await p.json(); if(!pj.ok) throw new Error(pj.error||p.status);
+    $("out").textContent="ABI stored ("+pj.functions+" functions). Now press List read functions.";
+  }catch(e){ $("out").textContent="Failed: "+e.message; }
+};
+$("state").onclick=()=>show("/api/state");
+</script>
+</body>
+</html>
