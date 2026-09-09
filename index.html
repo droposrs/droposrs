@@ -192,7 +192,7 @@ const PARTY = {
   minGp: 10_000_000,
   opsReservePct: 10,
 };
-const POOL  = { address: "0x889db1Bd374a040ec0b0B959c43Bb4ED5bF15924", tokenUrl: "", ponsUrl: "https://www.ponsfamily.com/launchpad/0x889db1Bd374a040ec0b0B959c43Bb4ED5bF15924" };
+const POOL  = { address: "0x4AD46957EC2A5559b403c0C19cC42B2F6B32f840", tokenUrl: "", ponsUrl: "https://www.ponsfamily.com/launchpad/0x4AD46957EC2A5559b403c0C19cC42B2F6B32f840" };
 const RATES = { quoteUsd: null, bondUsd: 10.0 };     // quoteUsd = ETH price; bondUsd from Jagex's store
 const LIVE  = { feesQuote: 0, series: [], updatedAt: null }; // cumulative ETH since last party, one point per 15 min
 const STATS = { raisedQuote: 0, raisedUsd: 0, givenGp: 0, parties: 0, streak: 0, treasuryQuote: 0, floatGp: 0 };
@@ -241,7 +241,7 @@ function renderPot(){
     : `${PARTY.opsReservePct}% kept for running costs. Pot freezes at ${PARTY.cutoffUtc} UTC; a night under ${gp(PARTY.minGp)} gp rolls into the next.`;
 }
 function renderStats(){
-  $("all-raised").textContent = usd(STATS.raisedUsd);
+  $("all-raised").textContent = STATS.raisedUsd < 100 ? usd2(STATS.raisedUsd) : usd(STATS.raisedUsd);
   $("all-raised-quote").textContent = STATS.raisedQuote.toFixed(4)+" ETH in creator fees";
   $("all-gp").textContent = gp(STATS.givenGp)+" gp";
   $("all-parties").textContent = `${STATS.parties} parties, ${STATS.streak} day streak`;

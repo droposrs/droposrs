@@ -54,6 +54,7 @@
     <button id="tick" class="quiet">Poll the curve now</button>
     <button id="discover" class="quiet">List read functions</button>
     <button id="state" class="quiet">Show /api/state</button>
+    <button id="reset" class="quiet" style="border-color:#d1553b">Reset indexer (after a relaunch)</button>
     <pre id="out"></pre>
   </div>
 </main>
@@ -86,6 +87,7 @@ $("abi").onclick=async()=>{
   }catch(e){ $("out").textContent="Failed: "+e.message; }
 };
 $("state").onclick=()=>show("/api/state");
+$("reset").onclick=()=>{ if(confirm("Reset the fee counter to zero? Only do this after changing CURVE_ADDRESS.")) post({action:"reset_indexer"},$("m2")); };
 </script>
 </body>
 </html>
